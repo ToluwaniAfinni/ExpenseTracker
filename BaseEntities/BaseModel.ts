@@ -6,9 +6,9 @@ export abstract class BaseModel
     @ObjectIdColumn()
     _id: ObjectId;
     
-    @Column()
+    @CreateDateColumn()
     CreatedAt: Date
 
-    @Column()
+    @UpdateDateColumn()
     UpdatedAt: Date
 }

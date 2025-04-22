@@ -9,7 +9,7 @@ export class Transaction extends BaseModel{
     // @Column()
     // Type: string //income or expense
 
-    @Column()
+    @Column({ nullable: true })
     Description: string
 
     @Column()
