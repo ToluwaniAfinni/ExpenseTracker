@@ -13,11 +13,11 @@ export class AuthService {
     private jwtService: JwtService
   ){}
 
-  async login(LoginDto: LoginDto)
+  async login(loginDto: LoginDto)
   {
     const user = await this.validateUser(loginDto);
     
-    // const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email };
     
     return {
       user: {

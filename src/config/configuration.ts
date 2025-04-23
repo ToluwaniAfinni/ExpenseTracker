@@ -1,5 +1,3 @@
-import { AppModule } from "src/app.module";
-
 export default () => ({
     // port: parseInt(process.env.PORT, 10) || 3000,
     port: 3000,
