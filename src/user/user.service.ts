@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from '../../BaseEntities/Response';
 import { HttpStatus } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { Console } from 'console';
+import { CreateUserResponseDto } from '../user/dto/CreateUserResponseDto'
 
 @Injectable()
 export class UserService {
@@ -20,24 +20,25 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     
     const { email, password } = createUserDto;
-    const UserResponse = new Response<User>;
+    const UserResponse = new Response<CreateUserResponseDto>;
     const UserData = new User;
 
     try
     {
         // Check if user exists
-      //   console.log("hello")
-      // const existingUser = await this.usersRepository.findOne({ where: { Email: email } });
 
-      // console.log("Hello", existingUser);
+      const existingUser = await this.usersRepository.findOne({ where: { Email: email } });
 
-      // if (existingUser !== null) {
-      //   // throw new ConflictException('Email already exists');
-      //   UserResponse.Data = UserData;
-      //   UserResponse.Message = "Email already exists";
-      //   UserResponse.StatusCode = HttpStatus.CONFLICT;
-      //   UserResponse.Success = false;
-      // }
+      console.log("Hello", existingUser);
+
+      if (existingUser !== null) {
+        // throw new ConflictException('Email already exists');
+        UserResponse.Data = existingUser;
+        UserResponse.Message = "Email already exists";
+        UserResponse.StatusCode = HttpStatus.CONFLICT;
+        UserResponse.Success = false;
+        return UserResponse;
+      }
       
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -53,16 +54,19 @@ export class UserService {
       
       await this.usersRepository.save(user);
 
-      UserResponse.Data = UserData;
+      const CreatedUserResp = new CreateUserResponseDto(
+        UserData.Username, UserData.Email,
+        UserData.CreatedAt, UserData.UpdatedAt
+      )
+
+      UserResponse.Data = CreatedUserResp;
       UserResponse.Message = "User Created Successfully";
       UserResponse.StatusCode = HttpStatus.CREATED;
       UserResponse.Success = true;
+      return UserResponse;
     }
     catch(e)
     {
-      // console.log(e);
-      console.log("test")
-      // UserResponse.Data = null;
       UserResponse.Message = "Error Creating User";
       UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       UserResponse.Success = false
