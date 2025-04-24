@@ -15,10 +15,10 @@ export class Transaction extends BaseModel{
     @Column()
     DateOftransaction: Date
 
-    @Column()
-    UserId: ObjectId
+    // @Column()
+    // UserId: ObjectId
 
-    @Column()
-    CategoryId: ObjectId
+    // @Column()
+    // CategoryId: ObjectId
 
 }
