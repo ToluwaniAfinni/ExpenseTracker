@@ -17,13 +17,13 @@ export class AuthService {
   {
     const user = await this.validateUser(loginDto);
     
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.Data?._id, email: user.Data?.Email, };
     
     return {
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+        id: user.Data?._id,
+        email: user.Data?.Email,
+        name: user.Data?.Username,
       },
       accessToken: this.jwtService.sign(payload),
     };
@@ -38,7 +38,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // if(user.Data?.PasswordHash !== null)
+    const isPasswordValid = await bcrypt.compare(password, user.Data?.PasswordHash);
     
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');

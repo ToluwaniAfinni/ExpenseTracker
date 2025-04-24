@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ObjectId } from 'typeorm';
 // import { GetUser } from '../common/decorators/get-user.decorator';
 
 @Controller('user')
@@ -29,12 +30,12 @@ export class UserController {
   }
 
   @Get('GetUserById:id')
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id') id: ObjectId) {
     return this.userService.findById(id);
   }
 
   @Patch('UpdateUser:id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 

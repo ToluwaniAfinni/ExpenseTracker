@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 
 export class Response<T>
 {
-    Data?: T;
+    Data: T;
 
     Message: string;
 

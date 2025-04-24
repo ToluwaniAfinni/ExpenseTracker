@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from '../../BaseEntities/Response';
 import { HttpStatus } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { Console } from 'console';
 
 @Injectable()
 export class UserService {
@@ -25,9 +26,13 @@ export class UserService {
     try
     {
         // Check if user exists
-      const existingUser = await this.usersRepository.findOne({ where: { email } });
+      const existingUser = await this.usersRepository.findOne({ where: { Email: email } });
       if (existingUser) {
-        throw new ConflictException('Email already exists');
+        // throw new ConflictException('Email already exists');
+        UserResponse.Data = UserData;
+        UserResponse.Message = "Email already exists";
+        UserResponse.StatusCode = HttpStatus.CONFLICT;
+        UserResponse.Success = false;
       }
       
       // Hash password
@@ -51,7 +56,8 @@ export class UserService {
     }
     catch(e)
     {
-      UserResponse.Data = e;
+      console.log(e);
+      // UserResponse.Data = null;
       UserResponse.Message = "Error Creating User";
       UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       UserResponse.Success = false
@@ -68,8 +74,8 @@ export class UserService {
      {
       // UserResponse.Data = null;
       UserResponse.Message = "User not found";
-      UserResponse.StatusCode = HttpStatus.CREATED;
-      UserResponse.Success = true;
+      UserResponse.StatusCode = HttpStatus.CONFLICT;
+      UserResponse.Success = false;
       return UserResponse
      }
      UserResponse.Data = UserData;
@@ -80,33 +86,105 @@ export class UserService {
     }
     catch(e)
     {
-      throw new NotFoundException('User not found');
+      console.log(e);
+      // UserResponse.Data = null;
+      UserResponse.Message = "Error fetching User";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
     }
   }
 
-  async findById(id: ObjectId): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: {_id : id } });
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async findById(id: ObjectId){
+    const UserResponse = new Response<User>;
+
+    try{
+      const UserData = await this.usersRepository.findOne({ where: {_id : id } });
+
+      if (UserData == null) {
+        // UserResponse.Data = null;
+        UserResponse.Message = "User not found";
+        UserResponse.StatusCode = HttpStatus.CONFLICT;
+        UserResponse.Success = false;
+        return UserResponse
+      }
+      UserResponse.Data = UserData;
+      UserResponse.Message = "User fetched Successfully";
+      UserResponse.StatusCode = HttpStatus.OK;
+      UserResponse.Success = true;
+      return UserResponse
     }
-    return user;
+    catch(e)
+    {
+      console.log(e);
+      UserResponse.Message = "Error fetching User";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
   }
 
-  async update(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findById(id);
-    
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+  async update(id: ObjectId, updateUserDto: UpdateUserDto){
+
+    const UserResponse = new Response<User>;
+
+    try{
+        const user = await this.findById(id);
+
+        if(user.Data == null)
+        {
+          UserResponse.Message = "User not found";
+          UserResponse.StatusCode = HttpStatus.CONFLICT;
+          UserResponse.Success = false;
+          return UserResponse
+        }
+        
+        if (updateUserDto.password) {
+          updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+        }
+        
+        Object.assign(user.Data, updateUserDto);
+
+        await this.usersRepository.save(user.Data);
+
+        UserResponse.Data = user.Data;
+        UserResponse.Message = "User Updated Successfully";
+        UserResponse.StatusCode = HttpStatus.OK;
+        UserResponse.Success = true;
+        return UserResponse
     }
-    
-    Object.assign(user, updateUserDto);
-    return this.usersRepository.save(user);
+    catch(e)
+    {
+      console.log(e);
+      UserResponse.Message = "Error updating User";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
   }
 
-  async remove(id: number): Promise<void> {
-    const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException('User not found');
+
+  async remove(id: number){
+      const UserResponse = new Response<User>;
+
+      try
+      {
+        const result = await this.usersRepository.delete(id);
+        if (result.affected === 0) {
+          UserResponse.Message = "User not found";
+          UserResponse.StatusCode = HttpStatus.CONFLICT;
+          UserResponse.Success = false;
+          return UserResponse
+      }
+    }
+      catch(e)
+      {
+        console.log(e);
+        UserResponse.Message = "Error deleting user User";
+        UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        UserResponse.Success = false
+        return UserResponse;
+      }
     }
   }
-}
+
