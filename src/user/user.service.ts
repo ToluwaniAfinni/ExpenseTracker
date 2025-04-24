@@ -26,14 +26,18 @@ export class UserService {
     try
     {
         // Check if user exists
-      const existingUser = await this.usersRepository.findOne({ where: { Email: email } });
-      if (existingUser) {
-        // throw new ConflictException('Email already exists');
-        UserResponse.Data = UserData;
-        UserResponse.Message = "Email already exists";
-        UserResponse.StatusCode = HttpStatus.CONFLICT;
-        UserResponse.Success = false;
-      }
+      //   console.log("hello")
+      // const existingUser = await this.usersRepository.findOne({ where: { Email: email } });
+
+      // console.log("Hello", existingUser);
+
+      // if (existingUser !== null) {
+      //   // throw new ConflictException('Email already exists');
+      //   UserResponse.Data = UserData;
+      //   UserResponse.Message = "Email already exists";
+      //   UserResponse.StatusCode = HttpStatus.CONFLICT;
+      //   UserResponse.Success = false;
+      // }
       
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -56,7 +60,8 @@ export class UserService {
     }
     catch(e)
     {
-      console.log(e);
+      // console.log(e);
+      console.log("test")
       // UserResponse.Data = null;
       UserResponse.Message = "Error Creating User";
       UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;

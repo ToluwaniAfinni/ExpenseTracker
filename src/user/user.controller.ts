@@ -15,8 +15,12 @@ export class UserController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User successfully created' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    var holder = await this.userService.create(createUserDto);
+
+    // console.log(holder);
+
+    return holder;
   }
 
   // @Get()
@@ -24,13 +28,13 @@ export class UserController {
   //   return this.userService.findAll();
   // }
 
-  @Get('GetUserByEmail:email')
+  @Get('GetUserByEmail/:email')
   getUserByEmail(@Param('email') email: string) {
     return this.userService.findByEmail(email);
   }
 
-  @Get('GetUserById:id')
-  getUserById(@Param('id') id: ObjectId) {
+  @Get('GetUserById/:id')
+  getUserById(@Body() id: ObjectId) {
     return this.userService.findById(id);
   }
 

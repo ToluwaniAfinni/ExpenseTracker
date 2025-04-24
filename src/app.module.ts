@@ -20,7 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mongodb',
-        url: 'mongodb+srv://Maverick:test123@cluster0.5phizz5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', //configService.get<string>('database.url'),
+        url: 'mongodb+srv://Maverick:test123@cluster0.5phizz5.mongodb.net/', //configService.get<string>('database.url'),
         useNewUrlParser: true,
         useUnifiedTopology: true,
         synchronize: true, //configService.get<boolean>('database.synchronize'),
